@@ -13,12 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class PacienteController {
 
+
     private final Hpaciente repository;
+
+    private final PacienteResourceAssembler assembler;
 
     PacienteController(Hpaciente repository) {
         this.repository = repository;
     }
 
+    PacienteController(PacienteRepository repository,
+                       PacienteResourceAssembler assembler) {
+
+        this.repository = repository;
+        this.assembler = assembler;
+    }
     // Aggregate root
 
     Resources<Resource<Paciente>> all() {
