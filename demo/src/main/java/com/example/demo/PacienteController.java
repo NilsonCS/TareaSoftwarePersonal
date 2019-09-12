@@ -49,9 +49,24 @@ class PacienteController {
 //        return repository.findAll();
 //    }
 
+
+
+   // Post sin rest #################
+//    @PostMapping("/pacientes")
+//    Paciente newPaciente(@RequestBody Paciente newPaciente) {
+//        return repository.save(newPaciente);
+//    }
+
+    //Post con rest ###########
+
     @PostMapping("/pacientes")
-    Paciente newPaciente(@RequestBody Paciente newPaciente) {
-        return repository.save(newPaciente);
+    ResponseEntity<?> newPaciente(@RequestBody Paciente newPaciente) throws URISyntaxException {
+
+        Resource<Paciente> resource = assembler.toResource(repository.save(newPaciente));
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
     // Single item
