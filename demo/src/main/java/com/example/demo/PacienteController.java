@@ -57,16 +57,30 @@ class PacienteController {
     // Single item
 // Mappign pacientes rest
 
+    //########## get usando el ensamblador
+
     @GetMapping("/pacientes/{id}")
     Resource<Paciente> one(@PathVariable Long id) {
 
-        Paciente employee = repository.findById(id)
+        Paciente paciente = repository.findById(id)
                 .orElseThrow(() -> new PacienteNotFoundException(id));
 
-        return new Resource<>(employee,
-                linkTo(methodOn(PacienteController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(PacienteController.class).all()).withRel("employees"));
+        return assembler.toResource(paciente);
     }
+
+
+
+
+//    @GetMapping("/pacientes/{id}")
+//    Resource<Paciente> one(@PathVariable Long id) {
+//
+//        Paciente employee = repository.findById(id)
+//                .orElseThrow(() -> new PacienteNotFoundException(id));
+//
+//        return new Resource<>(employee,
+//                linkTo(methodOn(PacienteController.class).one(id)).withSelfRel(),
+//                linkTo(methodOn(PacienteController.class).all()).withRel("employees"));
+//    }
 
 
 
