@@ -1,12 +1,11 @@
 package com.example.demo;
 
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.VndErrors;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
@@ -28,6 +27,21 @@ class TratamientoController {
         this.assembler = assembler;
     }
 
+
+    @DeleteMapping("/tratamientos/{id}/cancel")
+    ResponseEntity<ResourceSupport> cancel(@PathVariable Long id) {
+
+        Tratamiento tratamiento = tratamientoRepository.findById(id).orElseThrow(() -> new TratamientoNotFoundException(id));
+
+        if (tratamiento.getEstado() == Estado.progreso) {
+            tratamiento.setEstado(Estado.cancelado);
+            return ResponseEntity.ok(assembler.toResource(tratamientoRepository.save(tratamiento)));
+        }
+
+        return ResponseEntity
+                .status(HttpEstado.METHOD_NOT_ALLOWED)
+                .body(new VndErrors.VndError("Method not allowed", "You can't cancel an tratamiento that is in the " + tratamiento.getEstado() + " status"));
+    }
     @GetMapping("/tratamientos")
     Resources<Resource<Tratamiento>> all() {
 
@@ -46,10 +60,26 @@ class TratamientoController {
                         .orElseThrow(() -> new TratamientoController()NotFoundException(id)));
     }
 
+
+    @PutMapping("/tratamientos/{id}/completado")
+    ResponseEntity<ResourceSupport> complete(@PathVariable Long id) {
+
+        Tratamiento tratamiento = tratamientoRepository.findById(id).orElseThrow(() -> new TratamientoNotFoundException(id));
+
+        if (tratamiento.getEstado() == Estado.progreso) {
+            tratamiento.setEstado(Estado.completado);
+            return ResponseEntity.ok(assembler.toResource(tratamientoRepository.save(tratamiento)));
+        }
+
+        return ResponseEntity
+                .status(HttpEstado.METHOD_NOT_ALLOWED)
+                .body(new VndErrors.VndError("Method not allowed", "You can't complete an tratamiento that is in the " + tratamiento.getEstado() + " status"));
+    }
+
     @PostMapping("/tratamientos")
     ResponseEntity<Resource<Tratamiento>> newTratamiento(@RequestBody Tratamiento tratamiento) {
 
-        tratamiento.setEstado(Estado.IN_PROGRESS);
+        tratamiento.setEstado(Estado.progreso);
         Tratamiento newTratamiento = TratamientoRepository.save(tratamiento);
 
         return ResponseEntity
