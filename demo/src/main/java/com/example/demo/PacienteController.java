@@ -116,7 +116,13 @@ class PacienteController {
 //                linkTo(methodOn(PacienteController.class).all()).withRel("employees"));
 //    }
 
+    @DeleteMapping("/pacientes/{id}")
+    ResponseEntity<?> deletePaciente(@PathVariable Long id) {
 
+        repository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 
      // ###############  Mapping  pacientes no rest #########
