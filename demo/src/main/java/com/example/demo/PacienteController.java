@@ -83,7 +83,26 @@ class PacienteController {
         return assembler.toResource(paciente);
     }
 
+    @PutMapping("/pacientes/{id}")
+    ResponseEntity<?> replacePaciente(@RequestBody Paciente newPaciente, @PathVariable Long id) throws URISyntaxException {
 
+        Employee updatedPaciente = repository.findById(id)
+                .map(paciente -> {
+                    paciente.setNombre(newPaciente.getNombre());
+                    paciente.setRol(newPaciente.getRol());
+                    return repository.save(paciente);
+                })
+                .orElseGet(() -> {
+                    newPaciente.setId(id);
+                    return repository.save(newPaciente);
+                });
+
+        Resource<Paciente> resource = assembler.toResource(updatedPaciente);
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
+    }
 
 
 //    @GetMapping("/pacientes/{id}")
