@@ -21,10 +21,14 @@ class PacienteController {
 
     // Aggregate root
 
-    @GetMapping("/pacientes")
-    List<Paciente> all() {
-        return repository.findAll();
-    }
+    
+
+
+    // ###########Sin rest full#########
+//    @GetMapping("/pacientes")
+//    List<Paciente> all() {
+//        return repository.findAll();
+//    }
 
     @PostMapping("/pacientes")
     Paciente newPaciente(@RequestBody Paciente newPaciente) {
@@ -32,13 +36,29 @@ class PacienteController {
     }
 
     // Single item
+// Mappign pacientes rest
 
     @GetMapping("/pacientes/{id}")
-    Paciente one(@PathVariable Long id) {
+    Resource<Paciente> one(@PathVariable Long id) {
 
-        return repository.findById(id)
+        Paciente employee = repository.findById(id)
                 .orElseThrow(() -> new PacienteNotFoundException(id));
+
+        return new Resource<>(employee,
+                linkTo(methodOn(PacienteController.class).one(id)).withSelfRel(),
+                linkTo(methodOn(PacienteController.class).all()).withRel("employees"));
     }
+
+
+
+
+     // ###############  Mapping  pacientes no rest #########
+//    @GetMapping("/pacientes/{id}")
+//    Paciente one(@PathVariable Long id) {
+//
+//        return repository.findById(id)
+//                .orElseThrow(() -> new PacienteNotFoundException(id));
+//    }
 
     @PutMapping("/pacientes/{id}")
     Paciente replacePaciente(@RequestBody Paciente newPaciente, @PathVariable Long id) {
