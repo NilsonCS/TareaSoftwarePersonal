@@ -21,7 +21,17 @@ class PacienteController {
 
     // Aggregate root
 
-    
+    Resources<Resource<Paciente>> all() {
+
+        List<Resource<Paciente>> employees = repository.findAll().stream()
+                .map(paciente -> new Resource<>(paciente,
+                        linkTo(methodOn(PacienteController.class).one(paciente.getId())).withSelfRel(),
+                        linkTo(methodOn(PacienteController.class).all()).withRel("Pacientes")))
+                .collect(Collectors.toList());
+
+        return new Resources<>(pacientes,
+                linkTo(methodOn(PacienteController.class).all()).withSelfRel());
+    }
 
 
     // ###########Sin rest full#########
